@@ -1,23 +1,22 @@
 import 'dart:io';
 import 'output_color.dart';
 
-
 Map<String, String> userCredentials = {
-  'Dev': '123',
-  'Raingsey': '123',
-  'Sulinh': '123',
+  'User_A': '123',
+  'User_B': '123',
+  'User_C': '123',
 };
 
 Map<String, double> balances = {
-  'Dev': 700.0,
-  'Raingsey': 500.0,
-  'Sulinh': 300.0,
+  'User_A': 700.0,
+  'User_B': 500.0,
+  'User_C': 300.0,
 };
 
 Map<String, List<Map<String, dynamic>>> transactionHistory = {
-  'Dev': [],
-  'Raingsey': [],
-  'Sulinh': [],
+  'User_A': [],
+  'User_B': [],
+  'User_C': [],
 };
 
 String now() {
@@ -47,7 +46,8 @@ void deposit(String user) {
   balances[user] = balances[user]! + amount;
   addHistory(user, 'Deposit', amount, 'Self deposit');
   printSuccess(
-      'Deposit successful. New balance: \$${balances[user]!.toStringAsFixed(2)}');
+    'Deposit successful. New balance: \$${balances[user]!.toStringAsFixed(2)}',
+  );
 }
 
 void withdraw(String user) {
@@ -64,7 +64,8 @@ void withdraw(String user) {
   balances[user] = balances[user]! - amount;
   addHistory(user, 'Withdraw', amount, 'Self withdrawal');
   printSuccess(
-      'Withdraw successful. New balance: \$${balances[user]!.toStringAsFixed(2)}');
+    'Withdraw successful. New balance: \$${balances[user]!.toStringAsFixed(2)}',
+  );
 }
 
 void checkBalance(String user) {
@@ -108,43 +109,6 @@ void viewTransactionHistory(String user) {
   }
 }
 
-void transfer(String user) {
-  print('\nAvailable accounts: ${balances.keys.where((k) => k != user).join(', ')}');
-  stdout.write('Transfer to account: ');
-  String? target = stdin.readLineSync()?.trim();
-
-  if (target == null || !balances.containsKey(target)) {
-    printError('Account not found.');
-    return;
-  }
-  if (target == user) {
-    printError('Cannot transfer to yourself.');
-    return;
-  }
-
-  stdout.write('Transfer amount: \$');
-  double? amount = double.tryParse(stdin.readLineSync() ?? '');
-  if (amount == null || amount <= 0) {
-    printError('Invalid amount.');
-    return;
-  }
-  if (amount > balances[user]!) {
-    printError('Insufficient balance.');
-    return;
-  }
-
-  balances[user] = balances[user]! - amount;
-  balances[target] = balances[target]! + amount;
-
-  addHistory(user, 'Transfer Out', amount, 'Transferred to $target');
-  addHistory(target, 'Transfer In', amount, 'Received from $user');
-
-  printSuccess(
-      'Transfer successful! Sent \$${amount.toStringAsFixed(2)} to $target.');
-  printSuccess(
-      'Your new balance: \$${balances[user]!.toStringAsFixed(2)}');
-}
-
 void showMenu(String user) {
   bool inMenu = true;
   while (inMenu) {
@@ -153,9 +117,8 @@ void showMenu(String user) {
     print('2. Withdraw');
     print('3. Check Balance');
     print('4. Transaction History');
-    print('5. Transfer (Bonus)');
-    print('6. Logout');
-    print('7. Exit');
+    print('5. Logout');
+    print('6. Exit');
     stdout.write('Choose option: ');
     String? choice = stdin.readLineSync();
 
@@ -173,17 +136,14 @@ void showMenu(String user) {
         viewTransactionHistory(user);
         break;
       case '5':
-        transfer(user);
-        break;
-      case '6':
         printInfo('Logged out. Goodbye, $user!');
         inMenu = false;
         break;
-      case '7':
+      case '6':
         printInfo('Exiting... Goodbye!');
         exit(0);
       default:
-        printError('Invalid option. Please choose 1-7.');
+        printError('Invalid option. Please choose 1-6.');
     }
   }
 }
